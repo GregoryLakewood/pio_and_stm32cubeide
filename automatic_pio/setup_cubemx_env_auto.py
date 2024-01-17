@@ -40,7 +40,8 @@ config = root.find(".//configuration[@name='Debug']")
 for source_entry in config.findall("sourceEntries/entry"):
 	directory = source_entry.get('name')
 	if directory != "Core":
-		cubemx_directories.add(directory)
+		if directory != "Drivers":
+			cubemx_directories.add(directory)
 if cubemx_directories:
 	print("%s: Using the following source directories: 'Core, %s'"
     	% (log_name, ', '.join(cubemx_directories)))
@@ -68,8 +69,9 @@ tool_chain = config.find("./folderInfo/toolChain")
 for include_entry in tool_chain.findall(".//option[@superClass='com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths']/listOptionValue"):
 	inc_dir = include_entry.get('value')
 	if inc_dir != "../Core/Inc":
-		inc_dir = inc_dir.replace("../", "-I", 1)
-		include_dirs.append(inc_dir)
+		if not inc_dir.startswith("../Drivers/"):
+			inc_dir = inc_dir.replace("../", "-I", 1)
+			include_dirs.append(inc_dir)
 if not include_dirs:
 	raise SCons.Errors.BuildError(
             errstr="%s Error: Cannot read include directories from project file "
